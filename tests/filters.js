@@ -6,10 +6,14 @@ var plate = require('../index')
 test("Test that the add filter works as expected", mocktimeout(function(assert) {
 
         var tpl = new plate.Template("{{ test|add:3 }}"),
+            tpl_missing_var = new plate.Template("{{ missing|add:3 }}"),
             rnd = ~~(Math.random()*10);
 
         tpl.render({'test':rnd}, function(err, data) {
             assert.equal((rnd+3), parseInt(data, 10));
+        });
+        tpl_missing_var.render({}, function(err, data) {
+            assert.equal(data, '');
         });
     })
 )
@@ -50,6 +54,9 @@ test("Test that the addslashes filter works as expected", mocktimeout(function(a
         tpl.render(ctxt, function(err, data) {
             assert.equal(data.split('\\').length, num+1);
         });
+        tpl.render({}, function(err, data) {
+            assert.ok(err);
+        });
     })
 )
 
@@ -66,6 +73,9 @@ test("Test that the capfirst filter works as expected", mocktimeout(function(ass
         for(var i = 0; i < corpus.length; ++i) {
             emitter(corpus[i]);
         }
+        template.render({}, function(err, data) {
+            assert.equal(data, '');
+        });
     })
 )
 
@@ -99,6 +109,9 @@ test("Test that the center filter works as expected.", mocktimeout(function(asse
         item = corpus.shift();
         emitter(item, ~~(Math.random() * 10) + 2);
     }
+    template.render({'centernum': 2}, function(err, data) {
+        assert.equal(data, '  ');
+    });
 }))
 
 test("Test that the cut filter works as expected", mocktimeout(function(assert) {
@@ -115,6 +128,9 @@ test("Test that the cut filter works as expected", mocktimeout(function(assert) 
             };
         var len = ~~(Math.random() * 10);
         while(len-- > 0) emitter(rand());
+        template.render({'val': 'x'}, function(err, data) {
+            assert.equal(data, '');
+        });
     })
 )
 
@@ -127,6 +143,9 @@ test("Test that the date filter defaults to 'N j, Y'", mocktimeout(function(asse
 
         tpl.render({test:dt}, function(err, data) {
             assert.equal(data, now)
+        })
+        template.render({}, function(err, data) {
+            assert.equal(data, '')
         })
     })
 )
@@ -175,6 +194,9 @@ test("Test that the default filter works as expected", mocktimeout(function(asse
         while(corpus.length) {
             emitter(corpus.shift());
         }
+        template.render({'default': random}, function(err, data) {
+            assert.equal(''+data, ''+random);
+        });
     })
 )
 
@@ -204,6 +226,9 @@ test("Test that the dictsort filter works as expected", mocktimeout(function(ass
             while(split.length > 0) {
                 assert.equal(split.shift(), sorted.shift().toString());
             }
+        });
+        template.render({}, function(err, data) {
+            assert.equal(data, '');
         });
     })
 )
@@ -235,6 +260,9 @@ test("Test that the dictsortreversed filter works as expected", mocktimeout(func
                 assert.equal(split.shift(), sorted.shift().toString());
             }
         });
+        template.render({}, function(err, data) {
+            assert.equal(data, '');
+        });
     })
 )
 
@@ -245,12 +273,16 @@ test("Test that the divisibleby filter works as expected", mocktimeout(function(
             for(;accum.length < num; accum.push([~~(Math.random()*10), ~~(Math.random()*10)]));
             return accum;
         })(~~(Math.random() * 10) + 2),
-        template = new plate.Template("{% for x,y in pairs %}{% if x|divisibleby:y %}y{% else %}n{% endif %}\n{% endfor %}");
+        template = new plate.Template("{% for x,y in pairs %}{% if x|divisibleby:y %}y{% else %}n{% endif %}\n{% endfor %}"),
+        template_missing_var = new plate.Template("{% if x|divisibleby:y %}y{% else %}n{% endif %}");
         template.render({pairs:pairs}, function(err, data) {
             var bits = data.split('\n').slice(0, -1);
             for(var i = 0, len = bits.length; i < len; ++i) {
                 assert.equal(pairs[i][0] % pairs[i][1] == 0 ? 'y' : 'n', bits[i]);
             }
+        });
+        template_missing_var.render({'y': 5}, function(err, data) {
+            assert.ok(err);
         });
     })
 )
@@ -276,6 +308,9 @@ test("Test that the filesizeformat filter works as expected", mocktimeout(functi
                 });
             })(i);
         }
+        template.render({}, function(err, data) {
+            assert.equal(data, '0 bytes');
+        });
     })
 )
 
@@ -292,6 +327,9 @@ test("Test that the first filter works as expected", mocktimeout(function(assert
         template.render({items:items}, function(err, data) {
             assert.equal(data, items[0].toString());
         });
+        template.render({}, function(err, data) {
+            assert.equal(data, '');
+        });
     })
 )
 
@@ -300,6 +338,7 @@ test("Test that the floatformat filter works as expected", mocktimeout(function(
         var tpl = new plate.Template(
                 "{% for x,y in values %}{{ forloop.counter0 }}:{{ x|floatformat:y }}\n{% endfor %}"
             ),
+            tpl_missing_var = new plate.Template("{% x|floatformat %}")
             context = {
                 'values':[]
             };
@@ -333,6 +372,9 @@ test("Test that the floatformat filter works as expected", mocktimeout(function(
                 }
             }
         });
+        tpl_missing_var.render({}, function(err, data) {
+            assert.equal(data, '');
+        });
     })
 )
 
@@ -340,6 +382,9 @@ test("Test that the get_digit filter works as expected.", mocktimeout(function(a
 
       var tpl = new plate.Template(
         "{% for x in digit|make_list %}{{ digit|get_digit:forloop.counter }}\n{% endfor %}"
+      ),
+      tpl_missing_var = new plate.Template(
+        "{{ digit|get_digit:1 }}"
       ),
       context = {
         'digit':~~(Math.random()*1000)
@@ -349,6 +394,9 @@ test("Test that the get_digit filter works as expected.", mocktimeout(function(a
             num = context.digit.toString();
 
         assert.equal(bits.reverse().join(''), num+'');
+      });
+      tpl_missing_var.render({}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -381,6 +429,9 @@ test("Test that the join filter works as expected.", mocktimeout(function(assert
       tpl.render(context, function(err, data) {
         assert.equal(data, context.a_list.join(context.value));
       });
+      tpl.render({value: ' '}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -396,6 +447,9 @@ test("Test that last grabs the last element of a list.", mocktimeout(function(as
       };
       tpl.render(context, function(err, data) {
         assert.equal(data, ''+context.a_list[context.a_list.length-1]);
+      });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -416,6 +470,9 @@ test("Test that length works with simple arrays.", mocktimeout(function(assert) 
       };
       tpl.render(context, function(err, data) {
         assert.equal(context.a_list.length+'', data);
+      });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '0');
       });
     })
 )
@@ -446,6 +503,9 @@ test("Test that length_is works with simple arrays.", mocktimeout(function(asser
       var tpl = new plate.Template(
         "{{ a_list|length_is:a_list.length }}\n{{ a_list|length_is:0 }}"
       ),
+      tpl_missing_var = new plate.Template(
+        "{{ a_list|length_is:0 }}\n{{ a_list|length_is:1 }}"
+      ),
       random_array = function() {
         var len = 1+~~(Math.random()*100),
             out = [];
@@ -457,6 +517,9 @@ test("Test that length_is works with simple arrays.", mocktimeout(function(asser
       };
       tpl.render(context, function(err, data) {
         assert.equal('true\nfalse', data);
+      });
+      tpl_missing_var.render({}, function(err, data) {
+        assert.equal(data, 'true\nfalse');
       });
     })
 )
@@ -493,6 +556,9 @@ test("Test that linebreaks wraps all double-spaced elements in <p> tags.", mockt
       tpl.render(context, function(err, data) {
         assert.equal(data, "<p>Hi there</p><p>I am new to world</p><p>Enjoying time very much.</p>");
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '<p></p>');
+      });
     })
 )
 
@@ -521,6 +587,9 @@ test("Test that linebreaksbr converts all newlines to br elements", mocktimeout(
       tpl.render(context, function(err, data) {
         assert.equal(data, text.replace(/\n/g, '<br />'));
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -540,6 +609,9 @@ test("Test that linenumbers prepends line numbers to each line of input text.", 
         expected = expected.join('\n');
         assert.equal(data, expected);
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '1. ');
+      });
     })
 )
 
@@ -547,6 +619,9 @@ test("Test that ljust left justifies as expected.", mocktimeout(function(assert)
 
       var tpl = new plate.Template(
         "{% for i in range %}{{ str|ljust:i }}\n{% endfor %}"
+      ),
+      tpl_missing_var = new plate.Template(
+        "{{ str|ljust:2 }}"
       ),
       makeRange = function() {
         var out = [], len = ~~(Math.random()*20) + 1;
@@ -572,6 +647,9 @@ test("Test that ljust left justifies as expected.", mocktimeout(function(assert)
           }
         }
       });
+      tpl_missing_var.render({}, function(err, data) {
+        assert.equal(data, '  ');
+      });
     })
 )
 
@@ -579,9 +657,13 @@ test("Test that lower works.", mocktimeout(function(assert) {
 
       var tpl = new plate.Template(
         "{% for word in words %}{{ word|lower }}{% endfor %}"
-      );
+      )
+      tpl_missing_var = new plate.Template("{{ word|lower }}");
       tpl.render({words:['Asdf', '1ST', 'YEAHHHH']}, function(err, data) {
         assert.ok(!(/[A-Z]+/g).test(data));
+      });
+      tpl_missing_var.render({}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -636,6 +718,17 @@ test("Test that make_list works with numbers.", mocktimeout(function(assert) {
   })
 )
 
+test("Test that make_list works with missing variables.", mocktimeout(function(assert) {
+
+    var tpl = new plate.Template(
+      '{% for i in item|make_list %}{{ i }}{% if not forloop.last %}\n{% endif %}{% endfor %}'
+    );
+    tpl.render({}, function(err, data) {
+      assert.equal(data, '');
+    });
+  })
+)
+
 test("Test that phone2numeric works as expected.", mocktimeout(function(assert) {
 
       var phone = '1-800-4GO-OGLE',
@@ -645,6 +738,9 @@ test("Test that phone2numeric works as expected.", mocktimeout(function(assert) 
           );
       tpl.render({'item':phone}, function(err, data) {
         assert.equal(data, expected);
+      });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
       });
 
     })
@@ -674,6 +770,19 @@ test("Assert that pluralize coerces two arguments to singular, plural.", mocktim
     })
 )
 
+test("Assert that pluralize doesn't break on missing variables.", mocktimeout(function(assert) {
+
+      var tpl_one_arg = new plate.Template('{{ i|pluralize:"s" }}:'),
+          tpl_two_arg = new plate.Template('{{ i|pluralize:"y,s" }}:');
+      tpl_one_arg.render({}, function(err, data) {
+        assert.equal(data, ':');
+      });
+      tpl_two_arg.render({}, function(err, data) {
+        assert.equal(data, 'y:');
+      });
+    })
+)
+
 test("Assert that random pulls an item out of an array randomly.", mocktimeout(function(assert) {
 
       var arr = [1,2,3,4,5,6,7,8,9,10],
@@ -693,10 +802,23 @@ test("Assert that random pulls an item out of an array randomly.", mocktimeout(f
     })
 )
 
+test("Assert that random throws an error on missing variables.", mocktimeout(function(assert) {
+
+      var tpl = new plate.Template('{{ list|random }}');
+
+      tpl.render({}, function(err, data) {
+        assert.ok(err);
+      });
+    })
+)
+
 test("Test that rjust right justifies as expected.", mocktimeout(function(assert) {
 
       var tpl = new plate.Template(
         "{% for i in range %}{{ str|rjust:i }}\n{% endfor %}"
+      ),
+      tpl_missing_var = new plate.Template(
+        "{{ str|rjust:2 }}"
       ),
       makeRange = function() {
         var out = [], len = ~~(Math.random()*20) + 1;
@@ -720,6 +842,9 @@ test("Test that rjust right justifies as expected.", mocktimeout(function(assert
           }
         }
       });
+      tpl_missing_var.render({}, function(err, data) {
+        assert.equal(data, '  ');
+      });
     })
 )
 
@@ -727,9 +852,13 @@ test("Test that upper works.", mocktimeout(function(assert) {
 
       var tpl = new plate.Template(
         "{% for word in words %}{{ word|upper }}{% endfor %}"
-      );
+      ),
+      tpl_missing_var = new plate.Template("{{ word|upper }}");
       tpl.render({words:['Asdf', '1ST', 'YEAHHHH']}, function(err, data) {
         assert.ok(!(/[a-z]+/g).test(data));
+      });
+      tpl_missing_var.render({}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -759,6 +888,19 @@ test("Test that HTML characters may be marked 'safe'", mocktimeout(function(asse
       })
     })
 )
+
+test("Test safe filter doesn't break on missing variables.", mocktimeout(function(assert) {
+
+
+      var tpl = new plate.Template('{{ value|safe }}')
+      tpl.render({}, function(err, data) {
+        assert.ok(!err)
+
+        assert.equal(data, '')
+      })
+    })
+)
+
 test("Test that escape automatically escapes the input", mocktimeout(function(assert) {
 
 
@@ -787,13 +929,37 @@ test("Test that escape does not double-escape the input", mocktimeout(function(a
     })
 )
 
+test("Test escape filter doesn't break on missing variables.", mocktimeout(function(assert) {
+
+
+      var tpl = new plate.Template('{{ value|escape }}')
+      tpl.render({}, function(err, data) {
+        assert.ok(!err)
+
+        assert.equal(data, '')
+      })
+    })
+)
+
 test("Test that escape respects 'safe'", mocktimeout(function(assert) {
 
 
       var tpl = new plate.Template('{{ value|safe|escape }}')
         , x   = '&'
 
-      tpl.render({value:x}, function(err, data) {
+      tpl.render({value:x}, function(err, data) {test("Test safe filter doesn't break on missing variables.", mocktimeout(function(assert) {
+
+
+      var tpl = new plate.Template('{{ value|safe }}')
+      tpl.render({}, function(err, data) {
+        assert.ok(!err)
+
+        assert.equal(data, '')
+      })
+    })
+)
+
+
         assert.ok(!err)
 
         assert.equal(data, '&')
@@ -814,6 +980,19 @@ test("Test that force_escape does not respect 'safe'", mocktimeout(function(asse
       })
     })
 )
+
+test("Test force_escape filter doesn't break on missing variables.", mocktimeout(function(assert) {
+
+
+      var tpl = new plate.Template('{{ value|force_escape }}')
+      tpl.render({}, function(err, data) {
+        assert.ok(!err)
+
+        assert.equal(data, '')
+      })
+    })
+)
+
 test("Test that slice works with :N", mocktimeout(function(assert) {
 
       var items = [1,2,3,4],
@@ -830,6 +1009,9 @@ test("Test that slice works with :N", mocktimeout(function(assert) {
         for(var i = 0, len = bits.length; i < len; ++i) {
           assert.equal(bits[i], ''+expected[i]);
         }
+      });
+      tpl.render({rand:':'+rand}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -851,6 +1033,9 @@ test("Test that slice works with N:", mocktimeout(function(assert) {
           assert.equal(bits[i], ''+expected[i]);
         }
       });
+      tpl.render({rand:rand+':'}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -868,6 +1053,9 @@ test("Test that slugify removes unicode, turns spaces into dashes, lowercases ev
       tpl.render(context, function(err, data) {
         assert.ok(!((/[^a-z\-0-9_]+/g).test(data)));
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -881,6 +1069,7 @@ test("Test that timesince works as expected.", mocktimeout(function(assert) {
         , ['30 minutes', (+new Date) - 60000 * 30]
       ]
     , tpl = new plate.Template("{% for expected, time in times %}{{ time|timesince }}\n{% endfor %}")
+    , tpl_missing_vars = new plate.Template("{{ time|timesince }}")
 
     tpl.render({times:times}, function(err, data) {
       assert.ok(!err)
@@ -890,6 +1079,9 @@ test("Test that timesince works as expected.", mocktimeout(function(assert) {
         assert.equal(data[i], times[i][0])
       }
     })
+    tpl.render({}, function(err, data) {
+      assert.equal(data, '');
+    });
   })
 )
 
@@ -967,6 +1159,9 @@ test("Test that title titlecases input.", mocktimeout(function(assert) {
           assert.ok((/^[A-Z0-9]{1}[a-z']+/g).test(bits.pop()));
         }
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -986,6 +1181,9 @@ test("Test that striptags removes all HTML tags no matter how cool they are.", m
       tpl.render({text:testData}, function(err, data) {
           // fail if you see a tag.
           assert.ok(!((/<[^>]*?>/g).test(data)));
+      });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -1013,6 +1211,9 @@ test("Test that a string of characters gets truncated properly.", mocktimeout(fu
 
       tpl.render(context, function(err, data) {
         assert.equal(data, 'This is a collection of words.');
+      });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -1054,6 +1255,9 @@ test("Test that a string of words gets truncated properly.", mocktimeout(functio
       tpl.render(context, function(err, data) {
         assert.equal(data, 'This is a collection of words.');
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -1081,6 +1285,9 @@ test("Test that unordered list... makes unordered lists. Awesome ones.", mocktim
       tpl.render(context, function(err, data) {
         assert.equal(data, output);
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -1096,6 +1303,9 @@ test("Test that urlencode encodes all appropriate characters by using the built-
       tpl.render({str:stringOfEverything}, function(err, data) {
         assert.equal(data, escape(stringOfEverything));
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -1109,6 +1319,9 @@ test("Test that urlize will turn urls of the form http://whatever.com/whatever, 
 
       tpl.render({para:para}, function(err, data) {
         assert.equal(data, result);
+      });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
       });
     })
 )
@@ -1124,6 +1337,9 @@ test("Test that urlizetrunc will turn urls of the form http://whatever.com/whate
       tpl.render({para:para}, function(err, data) {
         assert.equal(data, result);
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
@@ -1136,6 +1352,9 @@ test("Assert that wordcount counts the number of words.", mocktimeout(function(a
       tpl.render({lorem:lorem}, function(err, data) {
         assert.equal(data, count.toString());
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '0');
+      });
     })
 )
 
@@ -1143,7 +1362,8 @@ test("Assert that wordwrap wraps lines at a given number.", mocktimeout(function
 
       var lorem = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
           values = [1,2,3,4,5,6,7,8,9],
-          tpl = new plate.Template("{% for value in values %}{{ lorem|wordwrap:value }}:{% endfor %}");
+          tpl = new plate.Template("{% for value in values %}{{ lorem|wordwrap:value }}:{% endfor %}"),
+          tpl_missing_var = new plate.Template("{{ lorem|wordwrap:5 }}");
 
       tpl.render({lorem:lorem, values:values}, function(err, data) {
         var bits = data.split(':').slice(0, -1);
@@ -1158,12 +1378,16 @@ test("Assert that wordwrap wraps lines at a given number.", mocktimeout(function
           assert.ok(max <= values[i]);
         }
       });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, '');
+      });
     })
 )
 
 test("Test that the yesno filter coerces values into truthy,falsy", mocktimeout(function(assert) {
 
       var tpl = new plate.Template('{% for value in values %}{{ value|yesno:"truthy,falsy" }}\n{% endfor %}'),
+          tpl_missing_var = new plate.Template('{{ value|yesno:"truthy,falsy" }}'),
           context = {
             values:[true, 1, {}, [], false, null]
           };
@@ -1174,12 +1398,16 @@ test("Test that the yesno filter coerces values into truthy,falsy", mocktimeout(
           assert.equal(bits[i], mode);
         }
       });
+      tpl_missing_var.render({}, function(err, data) {
+        assert.equal(data, 'falsy');
+      });
     })
 )
 
 test("Test that the yesno filter coerces values into true,false,maybe", mocktimeout(function(assert) {
 
       var tpl = new plate.Template('{% for value in values %}{{ value|yesno:"truthy,falsy,maybe" }}\n{% endfor %}'),
+          tpl_missing_var = new plate.Template('{{ value|yesno:"truthy,falsy,maybe" }}'),
           context = {
             values:[true, 1, {}, [], false, null]
           };
@@ -1189,6 +1417,9 @@ test("Test that the yesno filter coerces values into true,false,maybe", mocktime
           var mode = context.values[i] ? 'truthy' : context.values[i] === false ? 'falsy' : 'maybe';
           assert.equal(bits[i], mode);
         }
+      });
+      tpl.render({}, function(err, data) {
+        assert.equal(data, 'falsy');
       });
     })
 )
