@@ -1163,8 +1163,6 @@ test("Assert that wordwrap wraps lines at a given number.", mocktimeout(function
 
 test("Test that the yesno filter coerces values into truthy,falsy", mocktimeout(function(assert) {
 
-      return
-
       var tpl = new plate.Template('{% for value in values %}{{ value|yesno:"truthy,falsy" }}\n{% endfor %}'),
           context = {
             values:[true, 1, {}, [], false, null]
