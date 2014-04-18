@@ -144,7 +144,7 @@ test("Test that the date filter defaults to 'N j, Y'", mocktimeout(function(asse
         tpl.render({test:dt}, function(err, data) {
             assert.equal(data, now)
         })
-        template.render({}, function(err, data) {
+        tpl.render({}, function(err, data) {
             assert.equal(data, '')
         })
     })
