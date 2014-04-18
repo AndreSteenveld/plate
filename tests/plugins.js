@@ -8,13 +8,13 @@ var plate = require('../index'),
     mocktimeout = require('./mocktimeout')
 
 test("Test that the filesystem loader returns templates from filesystem.", function(assert) {
-        
+
         var loader = new filesystem.Loader(
                 [path.join(__dirname, 'templates')]
             );
 
         var p = loader.lookup('test.html')
-        
+
         p.once('done', function(template) {
             assert.ok(template instanceof plate.Template);
             assert.end()
@@ -23,9 +23,9 @@ test("Test that the filesystem loader returns templates from filesystem.", funct
 )
 
 test("Test that the filesystem loader works with the extends tag", function(assert) {
-        
+
         var lib = new libraries.Library(),
-            loader = new filesystem.Loader( 
+            loader = new filesystem.Loader(
                 [path.join(__dirname, 'templates')]
             );
 

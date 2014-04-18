@@ -4,14 +4,14 @@ var plate = require('../index')
   , mocktimeout = require('./mocktimeout')
 
 test("Test the exception cases of plate.Template.", mocktimeout(function(assert) {
-        
+
         assert.throws(function() {
             var tpl = new plate.Template(2);
         });
         assert.throws(function() {
             var tpl = new plate.Template();
         });
-        
+
         var tplstr = "random-"+Math.random(),
             tpl = new plate.Template(tplstr);
 
@@ -39,7 +39,7 @@ test("Test the exception cases of plate.Template.", mocktimeout(function(assert)
     }))
 
 test("Test that encountering a {% tag %} will lookup that tag in the provided library", mocktimeout(function(assert) {
-        
+
         var lib = new platelib.Library(),
             name = "random_"+~~Math.random(),
             value = Math.random().toString(),
@@ -58,7 +58,7 @@ test("Test that encountering a {% tag %} will lookup that tag in the provided li
     }))
 
 test("Test that filter nodes render as expected.", mocktimeout(function(assert) {
-        
+
         var testContext = {
             value:Math.random().toString(),
             deep:{
@@ -101,23 +101,23 @@ test("Test that filter nodes render as expected.", mocktimeout(function(assert) 
 )
 
 test("Test that hitting an unknown tag triggers an error.", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% lol dne %}");
         tpl.render({}, function(err, data) {
             assert.strictEqual(data, null);
-            assert.ok(err instanceof Error); 
+            assert.ok(err instanceof Error);
         });
     })
 )
 
 test("Test that autoregistration of the tag library works as expected.", mocktimeout(function(assert) {
-      
+
       var expected = ~~(Math.random()*100);
       var tag = {
         render:function(context, ready) {
           return expected
         }
-      }; 
+      };
       plate.Template.Meta.registerTag('lolwut', function() { return tag; });
 
       assert.doesNotThrow(function() {
@@ -130,7 +130,7 @@ test("Test that autoregistration of the tag library works as expected.", mocktim
 )
 
 test("Test that autoregistration of the filter library works as expected.", mocktimeout(function(assert) {
-      
+
       var expected = ~~(Math.random()*100);
       var testFilter = function(input) {
         return expected
@@ -148,7 +148,7 @@ test("Test that autoregistration of the filter library works as expected.", mock
 )
 
 test("Test that autoregistration of the plugin library works as expected.", mocktimeout(function(assert) {
-      
+
       var expected = ~~(Math.random()*100);
       var plugin = function() {
         return ''+expected;
