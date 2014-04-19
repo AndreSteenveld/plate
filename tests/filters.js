@@ -802,12 +802,12 @@ test("Assert that random pulls an item out of an array randomly.", mocktimeout(f
     })
 )
 
-test("Assert that random throws an error on missing variables.", mocktimeout(function(assert) {
+test("Assert that random doesn't break on missing variables.", mocktimeout(function(assert) {
 
       var tpl = new plate.Template('{{ list|random }}');
 
       tpl.render({}, function(err, data) {
-        assert.ok(err);
+        assert.equal(data, '');
       });
     })
 )
