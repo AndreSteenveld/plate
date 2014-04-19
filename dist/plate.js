@@ -392,7 +392,7 @@ proto.O = function() {
   var tzoffs = this.data.getTimezoneOffset()
     , offs = ~~(tzoffs / 60)
     , mins = ('00' + ~~Math.abs(tzoffs % 60)).slice(-2)
-  
+
   return ((tzoffs > 0) ? '-' : '+') + ('00' + Math.abs(offs)).slice(-2) + mins
 }
 
@@ -447,7 +447,7 @@ proto.w = function() {
 proto.W = function() {
   // ISO-8601 week number of year, weeks starting on Monday
   // Algorithm from http://www.personal.ecu.edu/mccartyr/ISOwdALG.txt
-  var jan1_weekday = new Date(this.data.getFullYear(), 0, 1).getDay() 
+  var jan1_weekday = new Date(this.data.getFullYear(), 0, 1).getDay()
     , weekday = this.data.getDay()
     , day_of_year = this.z()
     , week_number
@@ -518,7 +518,7 @@ function time_format(value, format_string) {
 module.exports = {
     log: function(value) { console.log(value) }
   , error: function(err) { console.error(err, err && err.stack) }
-  , info: function(value) { } 
+  , info: function(value) { }
 }
 
 },{}],7:[function(require,module,exports){
@@ -643,10 +643,6 @@ proto.resolve = function(context, value, fromIDX, argValues) {
 
   argValues = argValues || []
 
-  if(value === undefined) {
-    return
-  }
-
   if(value && value.constructor === Promise) {
     promise = new Promise
     value.once('done', function(val) {
@@ -658,7 +654,7 @@ proto.resolve = function(context, value, fromIDX, argValues) {
   }
 
   for(var i = start, len = self.args.length; i < len; ++i) {
-    var argValue = self.args[i].resolve ? 
+    var argValue = self.args[i].resolve ?
         self.args[i].resolve(context) :
         self.args[i]
 
@@ -672,7 +668,7 @@ proto.resolve = function(context, value, fromIDX, argValues) {
 
       argValue.once('done', function(val) {
         argValues[i] = val
-        promise.resolve(self.resolve( 
+        promise.resolve(self.resolve(
             context
           , value
           , i
@@ -700,7 +696,7 @@ proto.resolve = function(context, value, fromIDX, argValues) {
   return result
 
   function ready(err, data) {
-    if(promise.trigger) 
+    if(promise.trigger)
       return promise.resolve(err ? err : data)
 
     result = data
@@ -719,7 +715,7 @@ var cons = FilterChain
 
 proto.attach = function(parser) {
   for(var i = 0, len = this.bits.length; i < len; ++i) {
-    if(this.bits[i] && this.bits[i].attach) { 
+    if(this.bits[i] && this.bits[i].attach) {
       this.bits[i].attach(parser)
     }
   }
@@ -797,7 +793,7 @@ proto.resolve = function(context, fromIDX) {
       current = next
     }
 
-  } 
+  }
 
   return current
 }
@@ -854,7 +850,7 @@ function safely(fn) {
     try {
       return fn.call(this, context)
     } catch(err) {
-      debug.info(err) 
+      debug.info(err)
       return ''
     }
   }
@@ -891,11 +887,17 @@ proto.node = function(parser) {
 
 },{"./filter_node":12,"./token":90}],14:[function(require,module,exports){
 module.exports = function(input, value) {
-  return parseInt(input, 10) + parseInt(value, 10)
+  input = parseInt(input, 10);
+  value = parseInt(value, 10)
+  if (isNaN(input) || isNaN(value))
+    return ''
+  return input + value
 }
 
 },{}],15:[function(require,module,exports){
 module.exports = function(input) {
+  if (input === undefined || input === null)
+    input = ''
   return input.toString().replace(/'/g, "\\'")
 }
 
@@ -907,6 +909,9 @@ module.exports = function(input) {
 
 },{}],17:[function(require,module,exports){
 module.exports = function(input, len, ready) {
+  if (input === undefined || input === null)
+    input = ''
+
   if(ready === undefined)
     len = 0
 
@@ -914,7 +919,7 @@ module.exports = function(input, len, ready) {
     , value = ' '
 
   len -= str.length
-  if(len < 0) { 
+  if(len < 0) {
     return str
   }
 
@@ -931,7 +936,7 @@ module.exports = function(input, len, ready) {
   if((len_half - Math.floor(len_half)) > 0) {
     str = input.toString().length % 2 == 0 ? value + str : str + value
   }
-  
+
   return str
 }
 
@@ -943,7 +948,7 @@ module.exports = function(input, value) {
 
 },{}],19:[function(require,module,exports){
 var format = require('../date').date
-  
+
 module.exports = function(input, value, ready) {
   if (ready === undefined)
     value = 'N j, Y'
@@ -958,6 +963,9 @@ module.exports = function(input, def, ready) {
 
 },{}],21:[function(require,module,exports){
 module.exports = function(input, key) {
+  if (input === undefined || input === null)
+    input = []
+
   return input.sort(function(x, y) {
     if(x[key] > y[key]) return 1
     if(x[key] == y[key]) return 0
@@ -974,6 +982,9 @@ module.exports = function(input, key) {
 
 },{"./dictsort":21}],23:[function(require,module,exports){
 module.exports = function(input, num) {
+  if (isNaN(parseInt(input)))
+    throw new Error('Invalid input for divisibleby: ' + String(input))
+
   return input % parseInt(num, 10) == 0
 }
 
@@ -981,6 +992,10 @@ module.exports = function(input, num) {
 var FilterNode = require('../filter_node')
 
 module.exports = function(input) {
+  if (input === undefined) {
+    input = ''
+  }
+
   if(input && input.safe) {
     return input
   }
@@ -994,8 +1009,11 @@ module.exports = function(input) {
 module.exports = function(input) {
   var num = (new Number(input)).valueOf()
     , singular = num == 1 ? '' : 's'
-    , value 
-    
+    , value
+
+  if (isNaN(num))
+    num = 0
+
   value =
     num < 1024 ? num + ' byte'+singular :
     num < (1024*1024) ? (num/1024)+' KB' :
@@ -1022,6 +1040,9 @@ module.exports = function(input, val) {
     , pow_minus_one = Math.pow(10, Math.max(absValue-1, 0))
     , asString
 
+  if (isNaN(asNumber))
+    return ''
+
   asNumber = Math.round((pow * asNumber) / pow_minus_one)
 
   if(val !== 0)
@@ -1047,6 +1068,9 @@ module.exports = function(input, val) {
 var FilterNode = require('../filter_node')
 
 module.exports = function(input) {
+  if (input === undefined)
+    input = ''
+
   var x = new String(FilterNode.escape(input+''))
   x.safe = true
   return x
@@ -1097,30 +1121,42 @@ module.exports = function(input) {
 
 },{}],35:[function(require,module,exports){
 module.exports = function(input, ready) {
-  if(input && typeof input.length === 'function') {
-    return input.length(ready)
+  if(input) {
+    if (typeof input.length === 'function') {
+      return input.length(ready)
+    }
+    else {
+      return input.length
+    }
   }
-  return input.length
+  return 0
 }
 
 },{}],36:[function(require,module,exports){
 module.exports = function(input, expected, ready) {
   var tmp
-  if(input && typeof input.length === 'function') {
-    tmp = input.length(function(err, len) {
-      ready(err, err ? null : len === expected)
-    })
+  if(input) {
+    if (typeof input.length === 'function') {
+      tmp = input.length(function(err, len) {
+        ready(err, err ? null : len === expected)
+      })
 
-    return tmp === undefined ? undefined : tmp === expected
+      return tmp === undefined ? undefined : tmp === expected
+    }
+    else {
+      return input.length === expected
+    }
   }
-
-  return input.length === expected
+  return 0 === expected
 }
 
 },{}],37:[function(require,module,exports){
 var safe = require('./safe')
 
 module.exports = function(input) {
+  if (input === undefined || input === null)
+    input = ''
+
   var str = input.toString()
     , paras = str.split('\n\n')
     , out = []
@@ -1136,12 +1172,18 @@ module.exports = function(input) {
 var safe = require('./safe')
 
 module.exports = function(input) {
+  if (input === undefined || input === null)
+    input = ''
+
   var str = input.toString()
   return safe(str.replace(/\n/g, '<br />'))
 }
 
 },{"./safe":47}],39:[function(require,module,exports){
 module.exports = function(input) {
+  if (input === undefined || input === null)
+    input = ''
+
   var str = input.toString()
     , bits = str.split('\n')
     , out = []
@@ -1174,6 +1216,9 @@ module.exports = function(input) {
 
 },{}],42:[function(require,module,exports){
 module.exports = function(input) {
+  if (input === undefined || input === null)
+    input = ''
+
   input = input instanceof Array ? input : input.toString().split('')
 
   return input
@@ -1208,9 +1253,12 @@ module.exports = function(input, plural) {
   var val = Number(input)
     , suffix
 
+  if (isNaN(val))
+    val = 1
+
   suffix = plural[plural.length-1];
   if(val === 1) {
-    suffix = plural.length > 1 ? plural[0] : '';    
+    suffix = plural.length > 1 ? plural[0] : '';
   }
 
   return suffix
@@ -1218,6 +1266,9 @@ module.exports = function(input, plural) {
 
 },{}],45:[function(require,module,exports){
 module.exports = function(input) {
+  if (!input)
+    return null
+
   var cb = input.charAt || function(idx) {
     return this[idx];
   };
@@ -1243,6 +1294,9 @@ module.exports = function(input, num) {
 var FilterNode = require('../filter_node')
 
 module.exports = function(input) {
+  if (input === undefined)
+    input = ''
+
   input = new String(input)
   input.safe = true
   return input
@@ -1250,6 +1304,9 @@ module.exports = function(input) {
 
 },{"../filter_node":12}],48:[function(require,module,exports){
 module.exports = function(input, by) {
+  if (input === undefined || input === null)
+    input = []
+
   by = by.toString()
   if(by.charAt(0) === ':') {
     by = '0'+by
@@ -1345,7 +1402,7 @@ module.exports = function(input) {
   var str = input.toString()
     , bits = str.split(/\s{1}/g)
     , out = []
-  
+
   while(bits.length) {
     var word = bits.shift()
     word = word.charAt(0).toUpperCase() + word.slice(1)
@@ -1448,6 +1505,9 @@ module.exports = function(input, len) {
 
 },{"../url_finder":91,"./safe":47}],62:[function(require,module,exports){
 module.exports = function(input) {
+  if (input === undefined || input === null)
+    return 0
+
   var str = input.toString()
     , bits = str.split(/\s+/g)
 
@@ -1469,6 +1529,9 @@ module.exports = function(input, len) {
 
 },{}],64:[function(require,module,exports){
 module.exports = function(input, map) {
+  if (input === undefined)
+    input = false
+
   var ourMap = map.toString().split(',')
     , value
 
@@ -1484,10 +1547,10 @@ module.exports = function(input, map) {
 }
 
 },{}],65:[function(require,module,exports){
-(function(global){var FilterToken = require('./filter_token')
+var global=self;var FilterToken = require('./filter_token')
   , TagToken = require('./tag_token')
   , CommentToken = require('./comment_token')
-  , TextToken = require('./text_token') 
+  , TextToken = require('./text_token')
   , libraries = require('./libraries')
   , Parser = require('./parser')
   , Context = require('./context')
@@ -1501,7 +1564,7 @@ module.exports = Template
 Template.Template = Template
 Template.Context = Context
 
-var later = typeof global !== 'undefined' ? 
+var later = typeof global !== 'undefined' ?
     function(fn) { global.setTimeout(fn, 0) } :
     function(fn) { this.setTimeout(fn, 0) }
 
@@ -1517,10 +1580,10 @@ function Template(raw, libraries, parser) {
   this.tagLibrary =
     libraries.tag_library || Template.Meta.createTagLibrary()
 
-  this.filterLibrary = 
+  this.filterLibrary =
     libraries.filter_library || Template.Meta.createFilterLibrary()
 
-  this.pluginLibrary = 
+  this.pluginLibrary =
     libraries.plugin_library || Template.Meta.createPluginLibrary()
 
   this.parser = parser || Parser
@@ -1563,7 +1626,7 @@ proto.render = protect(function(context, ready) {
 
   var result
 
-  result = 
+  result =
   this
     .getNodeList()
     .render(context)
@@ -1635,14 +1698,13 @@ cons.tokenize = function(content) {
   return tokens
 }
 
-})(self)
 },{"./comment_token":3,"./context":4,"./filter_token":13,"./libraries":66,"./meta":68,"./parser":70,"./promise":71,"./tag_token":72,"./text_token":89}],66:[function(require,module,exports){
 module.exports = {
     Library: require('./library')
   , DefaultPluginLibrary: require('./library')
   , DefaultTagLibrary: require('./defaulttags')
   , DefaultFilterLibrary: require('./defaultfilters')
-} 
+}
 
 },{"./defaultfilters":7,"./defaulttags":8,"./library":67}],67:[function(require,module,exports){
 module.exports = Library
@@ -1733,7 +1795,7 @@ function createAutoregister(name) {
 function createLibrary(name) {
   return function() {
     if(this._cache[name])
-      return this._cache[name]; 
+      return this._cache[name];
 
     var lib = new this._classes[name]
 
@@ -1774,7 +1836,7 @@ proto.render = function(context) {
   }
 
   if(promises.length) {
-    return this.resolvePromises(results, promises) 
+    return this.resolvePromises(results, promises)
   }
 
   return results.join('')
@@ -1786,7 +1848,7 @@ proto.resolvePromises = function(results, promises) {
     , total = promises.length
 
   for(var i = 0, p = 0, len = results.length; i < len; ++i) {
-    if(results[i].constructor !== Promise) 
+    if(results[i].constructor !== Promise)
       continue
 
     promises[p++].once('done', bind(i, function(idx, result) {
@@ -2147,9 +2209,9 @@ proto.render = function(context) {
 
   block = push = blockContext.pop(self.name)
 
-  if(!block) { 
+  if(!block) {
     block = self
-  } 
+  }
 
   block = new BlockNode(block.name, block.nodes)
 
@@ -2177,7 +2239,7 @@ proto._super = function() {
   if(blockContext && (block = blockContext.get(this.name))) {
     str = new String(block.render(this.context))
     str.safe = true
-    return str 
+    return str
   }
 
   return ''
@@ -2198,7 +2260,7 @@ cons.parse = function(contents, parser) {
   nodes = parser.parse(['endblock'])
   parser.tokens.shift()
 
-  return new cons(name, nodes)  
+  return new cons(name, nodes)
 }
 
 },{"../block_context":2,"../promise":71}],74:[function(require,module,exports){
@@ -2320,7 +2382,7 @@ proto.render = function(context, parent) {
 
     parent.once('done', function(data) {
       promise.resolve(self.render(context, data))
-    })  
+    })
 
     return promise
   }
@@ -2395,7 +2457,7 @@ function getInIndex(bits) {
     if(bits[i] === 'in')
       return i
 
-  return -1 
+  return -1
 }
 
 proto.render = function(context, value) {
@@ -2449,7 +2511,7 @@ proto.render = function(context, value) {
     loop.revcounter0 = len - (i + 1)
     loop.first = i === 0
     loop.last = i === len - 1
-    loop.parentloop = parent 
+    loop.parentloop = parent
     ctxt.forloop = loop
 
     if(self.unpack.length === 1)
@@ -2460,8 +2522,8 @@ proto.render = function(context, value) {
     result = self.loop.render(ctxt)
     if(result.constructor === Promise)
       promises.push(result)
-     
-    bits.push(result) 
+
+    bits.push(result)
   }
 
   if(promises.length) {
@@ -2515,9 +2577,9 @@ function InfixOperator(bp, cmp) {
   this.lbp = bp
   this.cmp = cmp
 
-  this.first = 
+  this.first =
   this.second = null
-} 
+}
 
 var cons = InfixOperator
   , proto = cons.prototype
@@ -2705,43 +2767,43 @@ module.exports = {
   }
 
   , '=': function() {
-    return new InfixOperator(10, function(x, y) { 
+    return new InfixOperator(10, function(x, y) {
       return x == y
     })
   }
 
   , '==': function() {
-      return new InfixOperator(10, function(x, y) { 
+      return new InfixOperator(10, function(x, y) {
         return x == y
       })
     }
 
   , '!=': function() {
-      return new InfixOperator(10, function(x, y) { 
+      return new InfixOperator(10, function(x, y) {
         return x !== y
       })
     }
 
   , '>': function() {
-      return new InfixOperator(10, function(x, y) { 
+      return new InfixOperator(10, function(x, y) {
         return x > y
       })
     }
 
   , '>=': function() {
-      return new InfixOperator(10, function(x, y) { 
+      return new InfixOperator(10, function(x, y) {
         return x >= y
       })
     }
 
   , '<': function() {
-      return new InfixOperator(10, function(x, y) { 
+      return new InfixOperator(10, function(x, y) {
         return x < y
       })
     }
 
   , '<=': function() {
-      return new InfixOperator(10, function(x, y) { 
+      return new InfixOperator(10, function(x, y) {
         return x <= y
       })
     }
@@ -2783,7 +2845,7 @@ function in_operator(x, y) {
       var xkeys = keys(x),
         rkeys = keys(rhs)
 
-      if(xkeys.length === rkeys.length) { 
+      if(xkeys.length === rkeys.length) {
         for(var i = 0, len = xkeys.length, equal = true;
           i < len && equal;
           ++i) {
@@ -2791,7 +2853,7 @@ function in_operator(x, y) {
               x[xkeys[i]] === rhs[rkeys[i]]
         }
         found = equal
-      } 
+      }
     } else {
       found = x == rhs
     }
@@ -2890,7 +2952,7 @@ function PrefixOperator(bp, cmp) {
   this.lbp = bp
   this.cmp = cmp
 
-  this.first = 
+  this.first =
   this.second = null
 }
 
@@ -2944,7 +3006,7 @@ cons.parse = function(contents, parser) {
     , varname = parser.compile(bits.slice(1).join(' '))
     , loader = parser.plugins.lookup('loader')
 
-  return new cons(varname, loader) 
+  return new cons(varname, loader)
 }
 
 proto.render = function(context, target) {
@@ -2970,7 +3032,7 @@ proto.render = function(context, target) {
 
     target.once('done', function(data) {
       promise.resolve(self.render(context, data))
-    })  
+    })
 
     return promise
   }
@@ -3029,46 +3091,120 @@ module.exports = WithNode
 
 var Promise = require('../promise')
 
-function WithNode(with_var, as_var, nodes) {
-  this.with_var = with_var
-  this.as_var = as_var
+function WithNode(nodes, extra_context) {
   this.nodes = nodes
+  this.extra_context = extra_context || {}
 }
 
 var cons = WithNode
   , proto = cons.prototype
+  , kwarg_re = /(?:(\w+)=)?(.+)/
+
+function token_kwargs(bits, parser) {
+  var match
+    , kwarg_format
+    , kwargs
+    , key
+    , value
+
+  if(!bits.length)
+    return {}
+  match = kwarg_re.exec(bits[0])
+  kwarg_format = match && match[1]
+  if(!kwarg_format)
+    if(bits.length < 3 || bits[1] != 'as')
+      return {}
+
+  kwargs = {}
+  while(bits.length) {
+    if(kwarg_format) {
+      match = kwarg_re.exec(bits[0])
+      if(!match || !match[1]){
+        return kwargs
+      }
+      key = match[1]
+      value = match[2]
+      bits.shift()
+    } else {
+      if(bits.length < 3 || bits[1] != 'as') {
+        return kwargs
+      }
+      key = bits[2]
+      value = bits[0]
+      bits.splice(0, 3)
+    }
+    kwargs[key] = parser.compile(value)
+    if(bits.length && !kwarg_format) {
+      if(bits[0] != 'and') {
+        return kwargs
+      }
+      bits.shift()
+    }
+  }
+  return kwargs
+}
 
 cons.parse = function(contents, parser) {
   var bits = contents.split(/\s+/g)
-    , withvar = parser.compile(bits[1])
-    , asvar = bits[3]
     , nodelist = parser.parse(['endwith'])
+    , has_context_vars = false
+    , remaining_bits
+    , extra_context
+
+
+  remaining_bits = bits.slice(1)
+  extra_context = token_kwargs(remaining_bits, parser)
+
+  for(var context_var in extra_context)
+    if(extra_context.hasOwnProperty(context_var)) {
+      has_context_vars = true
+      break
+    }
+
+  if (!has_context_vars)
+      throw new Error('"'+bits[0]+'" expected at least one variable assignment')
+  if (remaining_bits.length)
+      throw new Error('"'+bits[0]+'" received an invalid token: "'+remaining_bits[0]+'"')
 
   parser.tokens.shift()
-  return new cons(withvar, asvar, nodelist)
+  return new cons(nodelist, extra_context)
 }
 
-proto.render = function(context, value) {
-  var self = this 
+proto.render = function(context) {
+  var self = this
     , result
-    , promise
-
-  value = arguments.length === 2 ? value : self.with_var.resolve(context)
-
-  if(value && value.constructor === Promise) {
-    promise = new Promise
-
-    value.once('done', function(data) {
-      promise.resolve(self.render(context, data))
-    })
-
-    return promise
-  }
+    , promise = new Promise
+    , promises = 0
 
   context = context.copy()
-  context[self.as_var] = value
 
-  result = self.nodes.render(context)
+  function promise_resolved(key) {
+    return function(data) {
+      context[key] = data;
+      if (--promises === 0) {
+        promise.resolve(self.nodes.render(context))
+      }
+    }
+  }
+
+  for(var key in self.extra_context) {
+    if(self.extra_context.hasOwnProperty(key)) {
+      value = self.extra_context[key].resolve(context)
+
+      if(value && value.constructor === Promise) {
+        promises++
+        value.once('done', promise_resolved(key))
+      }
+      else {
+        context[key] = value
+      }
+    }
+  }
+
+  if (promises)
+    return promise
+  else
+    result = self.nodes.render(context)
 
   return result
 }
