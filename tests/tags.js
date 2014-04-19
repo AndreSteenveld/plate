@@ -239,8 +239,8 @@ test("Test that for can reverse the contents of an array prior to iteration", mo
     })
 )
 
-test("Test that the with is enabled by default", mocktimeout(function(assert) {
-        
+test("Test that old-style with is enabled by default", mocktimeout(function(assert) {
+
         assert.doesNotThrow(function() {
             var tpl = new plate.Template("{% with x as y %}\n\n{% endwith %}");
             tpl.render({}, function(){});
@@ -248,8 +248,8 @@ test("Test that the with is enabled by default", mocktimeout(function(assert) {
     })
 )
 
-test("Test that with adds the variable into context", mocktimeout(function(assert) {
-        
+test("Test that old-style with adds the variable into context", mocktimeout(function(assert) {
+
         var context = {
             'value':~~(Math.random()*10)
         };
@@ -261,8 +261,8 @@ test("Test that with adds the variable into context", mocktimeout(function(asser
     })
 )
 
-test("Test that with does not leak context variables", mocktimeout(function(assert) {
-        
+test("Test that old-style with does not leak context variables", mocktimeout(function(assert) {
+
         var context = {
             'value':'hi'+~~(Math.random()*10),
             'othervalue':~~(Math.random()*10)+'yeah'
@@ -275,9 +275,69 @@ test("Test that with does not leak context variables", mocktimeout(function(asse
     })
 )
 
-test("Test that an unclosed with statement throws an error", mocktimeout(function(assert) {
-        
+test("Test that an unclosed old-style with statement throws an error", mocktimeout(function(assert) {
+
         var tpl = new plate.Template("{% with x as y %}\n\n yeahhhhh");
+        tpl.render({}, function(err, data){
+            assert.strictEqual(data, null);
+            assert.ok(err instanceof Error);
+        });
+    })
+)
+
+test("Test that with is enabled by default", mocktimeout(function(assert) {
+
+        assert.doesNotThrow(function() {
+            var tpl = new plate.Template("{% with y=x %}\n\n{% endwith %}");
+            tpl.render({}, function(){});
+        });
+    })
+)
+
+test("Test that with adds the variable into context", mocktimeout(function(assert) {
+
+        var context = {
+            'value':~~(Math.random()*10)
+        };
+        var tpl = new plate.Template("{% with othervalue=value %}{{ othervalue }}{% endwith %}");
+        tpl.render(context, function(err, data) {
+            assert.strictEqual(err, null);
+            assert.equal(data, context.value.toString());
+        });
+    })
+)
+
+test("Test that with works with multiple assignments", mocktimeout(function(assert) {
+
+        var context = {
+            'value':~~(Math.random()*10),
+            'anothervalue':~(Math.random()*10)+10
+        };
+        var tpl = new plate.Template("{% with othervalue=value lastvalue=anothervalue %}{{ othervalue }}{{ lastvalue }}{% endwith %}");
+        tpl.render(context, function(err, data) {
+            assert.strictEqual(err, null);
+            assert.equal(data, context.value.toString()+context.anothervalue.toString());
+        });
+    })
+)
+
+test("Test that with does not leak context variables", mocktimeout(function(assert) {
+
+        var context = {
+            'value':'hi'+~~(Math.random()*10),
+            'othervalue':~~(Math.random()*10)+'yeah'
+        };
+        var tpl = new plate.Template("{% with othervalue=value %}{{ othervalue }}{% endwith %}{{ othervalue }}");
+        tpl.render(context, function(err, data) {
+            assert.strictEqual(err, null);
+            assert.equal(data, context.value.toString()+context.othervalue.toString());
+        });
+    })
+)
+
+test("Test that an unclosed with statement throws an error", mocktimeout(function(assert) {
+
+        var tpl = new plate.Template("{% with y=x %}\n\n yeahhhhh");
         tpl.render({}, function(err, data){
             assert.strictEqual(data, null);
             assert.ok(err instanceof Error);
