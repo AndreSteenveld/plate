@@ -85,7 +85,7 @@ Got a feature you'd like to add? I'd love to see it. The workflow is pretty stan
 
 * Fork this repository.
 * Create a branch -- title it descriptively, please :)
-* Work, work, work. 
+* Work, work, work.
 * Push your changes and submit a pull request.
 
 The minimum requirements for a pull request to be merged are:

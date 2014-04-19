@@ -17,7 +17,7 @@ test("Test malformed {% if %} tag", mocktimeout(function(assert) {
 }))
 
 test("Test that for is enabled by default", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% for x in y %}{% empty %}{% endfor %}");
 
         assert.doesNotThrow(function() {
@@ -35,7 +35,7 @@ test("Test that for - empty works", mocktimeout(function(assert) {
 }))
 
 test("Test that for does not bubble errors if it cannot find the appropriate arrayVar", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% for x in y %}{% endfor %}");
 
         tpl.render({}, function(err, data) {
@@ -45,7 +45,7 @@ test("Test that for does not bubble errors if it cannot find the appropriate arr
 )
 
 test("Test that entering a for loop provides the forloop.counter", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -65,7 +65,7 @@ test("Test that entering a for loop provides the forloop.counter", mocktimeout(f
 )
 
 test("Test that entering a for loop provides the forloop.counter0", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -85,7 +85,7 @@ test("Test that entering a for loop provides the forloop.counter0", mocktimeout(
 )
 
 test("Test that entering a for loop provides the forloop.revcounter", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -105,7 +105,7 @@ test("Test that entering a for loop provides the forloop.revcounter", mocktimeou
 )
 
 test("Test that entering a for loop provides the forloop.revcounter0", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -125,7 +125,7 @@ test("Test that entering a for loop provides the forloop.revcounter0", mocktimeo
 )
 
 test("Test that entering a for loop provides the forloop.first", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -145,7 +145,7 @@ test("Test that entering a for loop provides the forloop.first", mocktimeout(fun
 )
 
 test("Test that entering a for loop provides the forloop.last", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -165,7 +165,7 @@ test("Test that entering a for loop provides the forloop.last", mocktimeout(func
 )
 
 test("Test that entering a nested forloop provides forloop.parentloop", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -188,7 +188,7 @@ test("Test that entering a nested forloop provides forloop.parentloop", mocktime
 )
 
 test("Test that for unpacks variables as needed", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -205,7 +205,7 @@ test("Test that for unpacks variables as needed", mocktimeout(function(assert) {
 
             assert.strictEqual(err, null);
             assert.equal(items.length, size);
-            
+
             for(i = 0; i < size; ++i) {
                 assert.equal(items[i], arr[i].join(','));
             }
@@ -214,7 +214,7 @@ test("Test that for unpacks variables as needed", mocktimeout(function(assert) {
 )
 
 test("Test that for can reverse the contents of an array prior to iteration", mocktimeout(function(assert) {
-        
+
         var size = ~~(Math.random()*10)+1,
             arr = [],
             context = {};
@@ -231,7 +231,7 @@ test("Test that for can reverse the contents of an array prior to iteration", mo
 
             assert.strictEqual(err, null);
             assert.equal(items.length, size);
- 
+
             for(i = 0; i < size; ++i) {
                 assert.equal(items[i], arr[(size-1)-i].join(','));
             }
@@ -346,7 +346,7 @@ test("Test that an unclosed with statement throws an error", mocktimeout(functio
 )
 
 test("Test that if tag is enabled by default", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% if x %}{% endif %}");
         assert.doesNotThrow(function() {
             tpl.render({}, function(err, data) {});
@@ -355,7 +355,7 @@ test("Test that if tag is enabled by default", mocktimeout(function(assert) {
 )
 
 test("Test that =, ==, and != work", mocktimeout(function(assert) {
-        
+
         var pairs = [[~~(Math.random()*10), ~~(10 + Math.random()*10)],
                     [3, 3],
                     ['string', 'string']],
@@ -380,7 +380,7 @@ test("Test that =, ==, and != work", mocktimeout(function(assert) {
 )
 
 test("Test that in and not in work", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% for x,y,z in list %}{% if x in y %}y{% endif %}{% if x not in y %}n{% endif %}:{{ z }}\n{% endfor %}"),
             tests = [
                 [[1,2], [1,2,3], 'n'],
@@ -400,7 +400,7 @@ test("Test that in and not in work", mocktimeout(function(assert) {
 )
 
 test("Test that >, <, <=, and >= work", mocktimeout(function(assert) {
-        
+
         var pairs = [[~~(Math.random()*10), ~~(10 + Math.random()*10)],
                     [3, 3],
                     ['string', 'string']],
@@ -427,7 +427,7 @@ test("Test that >, <, <=, and >= work", mocktimeout(function(assert) {
 
 
 test("Test that extends does not trigger a parser error.", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% extends whatever %}");
         plate.Template.Meta.registerPlugin('loader', function() {})
         assert.doesNotThrow(function() {
@@ -437,7 +437,7 @@ test("Test that extends does not trigger a parser error.", mocktimeout(function(
 )
 
 test("Test that extending a template produces super great results.", function(assert) {
-        
+
         var base = new plate.Template("hey {% block who %}<b>gary</b>{% endblock %}, how are you?"),
             child = new plate.Template("{% extends base %}{% block who %}{{ block.super }} busey{% endblock %}"),
             ctxt = { base:base };
@@ -451,7 +451,7 @@ test("Test that extending a template produces super great results.", function(as
 )
 
 test("Test that multilevel extending works", function(assert) {
-        
+
         var base = new plate.Template("hey {% block firstname %}{% endblock %} {% block lastname %}{% endblock %}"+
                                         ", {% block greeting %}hi there{% endblock %}"),
             child1 = new plate.Template("{% extends base %}{% block firstname %}gary{% endblock %}"),
@@ -471,7 +471,7 @@ test("Test that multilevel extending works", function(assert) {
 )
 
 test("Test that include does not trigger a parser error", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% include something %}");
 
 
@@ -482,7 +482,7 @@ test("Test that include does not trigger a parser error", mocktimeout(function(a
 )
 
 test("Test that include will include the contents of the included template into the includer.", function(assert) {
-        
+
         var random = "random-"+Math.random(),
             include = new plate.Template(random),
             tpl = new plate.Template("{% include tpl %}"),
@@ -528,7 +528,7 @@ test("Test that the loader plugin works with include", function(assert) {
 )
 
 test("Test that comment does not trigger a parser error", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% comment %}{% endcomment %}");
         assert.doesNotThrow(function() {
             tpl.getNodeList();
@@ -537,7 +537,7 @@ test("Test that comment does not trigger a parser error", mocktimeout(function(a
 )
 
 test("Test that comment omits all items wrapped inside the comment block.", mocktimeout(function(assert) {
-        
+
         var tpl = new plate.Template("{% comment %}asdf{% endcomment %}");
         tpl.render({}, function(err, data) {
             assert.equal(data, '');
@@ -551,26 +551,26 @@ test("test that now defaults to now N y, J", mocktimeout(function(assert) {
 
       tpl.render({}, function(err, data) {
         assert.equal(data, now)
-      }) 
+      })
 
     })
 )
 
 test("test that now can be configured with another argument", mocktimeout(function(assert) {
-      
+
 
       var tpl = new plate.Template('{% now "jS o\\f F" %}')
         , now = format(new Date, 'jS o\\f F')
 
       tpl.render({}, function(err, data) {
         assert.equal(data, now)
-      }) 
+      })
 
     })
 )
 
 test("test that olde-style loader plugins work", function(assert) {
-  var lib = new library() 
+  var lib = new library()
   lib.register('loader', olde_loader)
 
   var tpl = new plate.Template('{% include "xxx" %}', {plugin_library: lib})
@@ -586,4 +586,4 @@ test("test that olde-style loader plugins work", function(assert) {
       ready(null, new plate.Template('ok'))
     })
   }
-}) 
+})

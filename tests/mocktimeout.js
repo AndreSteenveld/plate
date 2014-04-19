@@ -1,4 +1,4 @@
-var world = typeof global !== 'undefined' ? global : this 
+var world = typeof global !== 'undefined' ? global : this
 
 module.exports = function mocktimeout(fn) {
   return function(assert) {

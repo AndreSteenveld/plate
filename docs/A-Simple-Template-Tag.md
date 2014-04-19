@@ -37,7 +37,7 @@ A good first step is to write a simple, synchronous template tag -- in this case
   })
 ````
 
-The two required pieces for a template tag are the `Node` class and the `parse` function. 
+The two required pieces for a template tag are the `Node` class and the `parse` function.
 Whenever a '{% templatetagname %}' token is encountered, plate attempts to look up the registered
 parser for that name. If it's found, it calls the parse function with the string contents of that
 tag (sans leading and trailing whitespace) -- so `{% tag thing1 thing2 thing3 %}` will be call the 'tag'

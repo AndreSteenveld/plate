@@ -21,7 +21,7 @@ function make_format_equiv(method, for_date, should_equal) {
   return test("test of '"+method+"'", function(assert) {
     var fmt = new utils.DateFormat(for_date)
     assert.equal(''+fmt[method](), ''+should_equal)
-    assert.end()     
+    assert.end()
   })
 }
 
@@ -31,7 +31,7 @@ test("test that the formatter works as expected", function(assert) {
         for(var i = 0; i < str.length; ++i) {
           arr.push(str.charAt(i));
         }
-        return arr 
+        return arr
       }
 
     var format    = strtoarr("aAbcdDEfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ")
@@ -297,7 +297,7 @@ test("test day of year", function(assert) {
   var year = +new Date(new Date().getFullYear(), 0, 1, 0, 0)
     , day = 1000 * 60 * 60 * 24
 
-  for(var i = 0; i < 365; ++i) { 
+  for(var i = 0; i < 365; ++i) {
     assert.equal(utils.date(new Date(year + (day * i) + 1000), 'z'), ''+(i + 1))
   }
 
