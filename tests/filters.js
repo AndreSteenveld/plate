@@ -55,7 +55,7 @@ test("Test that the addslashes filter works as expected", mocktimeout(function(a
             assert.equal(data.split('\\').length, num+1);
         });
         tpl.render({}, function(err, data) {
-            assert.ok(err);
+            assert.equal(data, '');
         });
     })
 )
@@ -338,7 +338,7 @@ test("Test that the floatformat filter works as expected", mocktimeout(function(
         var tpl = new plate.Template(
                 "{% for x,y in values %}{{ forloop.counter0 }}:{{ x|floatformat:y }}\n{% endfor %}"
             ),
-            tpl_missing_var = new plate.Template("{% x|floatformat %}")
+            tpl_missing_var = new plate.Template("{{ x|floatformat }}")
             context = {
                 'values':[]
             };
@@ -1418,7 +1418,7 @@ test("Test that the yesno filter coerces values into true,false,maybe", mocktime
           assert.equal(bits[i], mode);
         }
       });
-      tpl.render({}, function(err, data) {
+      tpl_missing_var.render({}, function(err, data) {
         assert.equal(data, 'falsy');
       });
     })
