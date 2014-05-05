@@ -889,15 +889,17 @@ proto.node = function(parser) {
 module.exports = function(input, value) {
   input = parseInt(input, 10);
   value = parseInt(value, 10)
-  if (isNaN(input) || isNaN(value))
+  if(isNaN(input) || isNaN(value)) {
     return ''
+  }
   return input + value
 }
 
 },{}],15:[function(require,module,exports){
 module.exports = function(input) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = ''
+  }
   return input.toString().replace(/'/g, "\\'")
 }
 
@@ -909,11 +911,13 @@ module.exports = function(input) {
 
 },{}],17:[function(require,module,exports){
 module.exports = function(input, len, ready) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = ''
+  }
 
-  if(ready === undefined)
+  if(ready === undefined) {
     len = 0
+  }
 
   var str = input.toString()
     , value = ' '
@@ -950,8 +954,9 @@ module.exports = function(input, value) {
 var format = require('../date').date
 
 module.exports = function(input, value, ready) {
-  if (ready === undefined)
+  if(ready === undefined) {
     value = 'N j, Y'
+  }
 
   return format(input.getFullYear ? input : new Date(input), value)
 }
@@ -963,8 +968,9 @@ module.exports = function(input, def, ready) {
 
 },{}],21:[function(require,module,exports){
 module.exports = function(input, key) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = []
+  }
 
   return input.sort(function(x, y) {
     if(x[key] > y[key]) return 1
@@ -982,8 +988,9 @@ module.exports = function(input, key) {
 
 },{"./dictsort":21}],23:[function(require,module,exports){
 module.exports = function(input, num) {
-  if (isNaN(parseInt(input)))
+  if(isNaN(parseInt(input))) {
     throw new Error('Invalid input for divisibleby: ' + String(input))
+  }
 
   return input % parseInt(num, 10) == 0
 }
@@ -992,7 +999,7 @@ module.exports = function(input, num) {
 var FilterNode = require('../filter_node')
 
 module.exports = function(input) {
-  if (input === undefined) {
+  if(input === undefined) {
     input = ''
   }
 
@@ -1011,8 +1018,9 @@ module.exports = function(input) {
     , singular = num == 1 ? '' : 's'
     , value
 
-  if (isNaN(num))
+  if(isNaN(num)) {
     num = 0
+  }
 
   value =
     num < 1024 ? num + ' byte'+singular :
@@ -1040,13 +1048,15 @@ module.exports = function(input, val) {
     , pow_minus_one = Math.pow(10, Math.max(absValue-1, 0))
     , asString
 
-  if (isNaN(asNumber))
+  if(isNaN(asNumber)) {
     return ''
+  }
 
   asNumber = Math.round((pow * asNumber) / pow_minus_one)
 
-  if(val !== 0)
+  if(val !== 0) {
     asNumber /= 10
+  }
 
   asString = asNumber.toString()
 
@@ -1068,8 +1078,9 @@ module.exports = function(input, val) {
 var FilterNode = require('../filter_node')
 
 module.exports = function(input) {
-  if (input === undefined)
+  if(input === undefined) {
     input = ''
+  }
 
   var x = new String(FilterNode.escape(input+''))
   x.safe = true
@@ -1124,8 +1135,7 @@ module.exports = function(input, ready) {
   if(input) {
     if (typeof input.length === 'function') {
       return input.length(ready)
-    }
-    else {
+    } else {
       return input.length
     }
   }
@@ -1142,8 +1152,7 @@ module.exports = function(input, expected, ready) {
       })
 
       return tmp === undefined ? undefined : tmp === expected
-    }
-    else {
+    } else {
       return input.length === expected
     }
   }
@@ -1154,8 +1163,9 @@ module.exports = function(input, expected, ready) {
 var safe = require('./safe')
 
 module.exports = function(input) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = ''
+  }
 
   var str = input.toString()
     , paras = str.split('\n\n')
@@ -1172,8 +1182,9 @@ module.exports = function(input) {
 var safe = require('./safe')
 
 module.exports = function(input) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = ''
+  }
 
   var str = input.toString()
   return safe(str.replace(/\n/g, '<br />'))
@@ -1181,8 +1192,9 @@ module.exports = function(input) {
 
 },{"./safe":47}],39:[function(require,module,exports){
 module.exports = function(input) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = ''
+  }
 
   var str = input.toString()
     , bits = str.split('\n')
@@ -1216,8 +1228,9 @@ module.exports = function(input) {
 
 },{}],42:[function(require,module,exports){
 module.exports = function(input) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = ''
+  }
 
   input = input instanceof Array ? input : input.toString().split('')
 
@@ -1253,8 +1266,9 @@ module.exports = function(input, plural) {
   var val = Number(input)
     , suffix
 
-  if (isNaN(val))
+  if(isNaN(val)) {
     val = 1
+  }
 
   suffix = plural[plural.length-1];
   if(val === 1) {
@@ -1266,8 +1280,9 @@ module.exports = function(input, plural) {
 
 },{}],45:[function(require,module,exports){
 module.exports = function(input) {
-  if (!input)
+  if(!input) {
     return null
+  }
 
   var cb = input.charAt || function(idx) {
     return this[idx];
@@ -1294,8 +1309,9 @@ module.exports = function(input, num) {
 var FilterNode = require('../filter_node')
 
 module.exports = function(input) {
-  if (input === undefined)
+  if(input === undefined) {
     input = ''
+  }
 
   input = new String(input)
   input.safe = true
@@ -1304,8 +1320,9 @@ module.exports = function(input) {
 
 },{"../filter_node":12}],48:[function(require,module,exports){
 module.exports = function(input, by) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     input = []
+  }
 
   by = by.toString()
   if(by.charAt(0) === ':') {
@@ -1356,8 +1373,9 @@ module.exports = function(input, n, ready) {
     , diff  = input - now
     , since = Math.abs(diff)
 
-  if(diff > 0)
+  if(diff > 0) {
     return '0 minutes'
+  }
 
   // 365.25 * 24 * 60 * 60 * 1000 === years
   var years =   ~~(since / 31557600000)
@@ -1418,11 +1436,13 @@ module.exports = function(input, n) {
   var str = input.toString()
     , num = parseInt(n, 10)
 
-  if(isNaN(num))
+  if(isNaN(num)) {
     return input
+  }
 
-  if(input.length <= num)
+  if(input.length <= num) {
     return input
+  }
 
   return input.slice(0, num)+'...'
 }
@@ -1433,13 +1453,15 @@ module.exports = function(input, n) {
     , num = parseInt(n, 10)
     , words
 
-  if(isNaN(num))
+  if(isNaN(num)) {
     return input
+  }
 
   words = input.split(/\s+/)
 
-  if(words.length <= num)
+  if(words.length <= num) {
     return input
+  }
 
   return words.slice(0, num).join(' ')+'...'
 }
@@ -1455,10 +1477,11 @@ var ulparser = function(list) {
   while(l.length) {
     item = l.pop()
 
-    if(item instanceof Array)
+    if(item instanceof Array) {
       out.unshift('<ul>'+ulparser(item)+'</ul>')
-    else
+    } else {
       out.unshift('</li><li>'+item)
+    }
   }
 
   // get rid of the leading </li>, if any. add trailing </li>.
@@ -1505,8 +1528,9 @@ module.exports = function(input, len) {
 
 },{"../url_finder":91,"./safe":47}],62:[function(require,module,exports){
 module.exports = function(input) {
-  if (input === undefined || input === null)
+  if(input === undefined || input === null) {
     return 0
+  }
 
   var str = input.toString()
     , bits = str.split(/\s+/g)
@@ -1529,8 +1553,9 @@ module.exports = function(input, len) {
 
 },{}],64:[function(require,module,exports){
 module.exports = function(input, map) {
-  if (input === undefined)
+  if(input === undefined) {
     input = false
+  }
 
   var ourMap = map.toString().split(',')
     , value
@@ -3107,19 +3132,22 @@ function token_kwargs(bits, parser) {
     , key
     , value
 
-  if(!bits.length)
+  if(!bits.length) {
     return {}
+  }
   match = kwarg_re.exec(bits[0])
   kwarg_format = match && match[1]
-  if(!kwarg_format)
-    if(bits.length < 3 || bits[1] != 'as')
+  if(!kwarg_format) {
+    if(bits.length < 3 || bits[1] !== 'as') {
       return {}
+    }
+  }
 
   kwargs = {}
   while(bits.length) {
     if(kwarg_format) {
       match = kwarg_re.exec(bits[0])
-      if(!match || !match[1]){
+      if(!match || !match[1]) {
         return kwargs
       }
       key = match[1]
@@ -3155,16 +3183,19 @@ cons.parse = function(contents, parser) {
   remaining_bits = bits.slice(1)
   extra_context = token_kwargs(remaining_bits, parser)
 
-  for(var context_var in extra_context)
+  for(var context_var in extra_context) {
     if(extra_context.hasOwnProperty(context_var)) {
       has_context_vars = true
       break
     }
+  }
 
-  if (!has_context_vars)
-      throw new Error('"'+bits[0]+'" expected at least one variable assignment')
-  if (remaining_bits.length)
-      throw new Error('"'+bits[0]+'" received an invalid token: "'+remaining_bits[0]+'"')
+  if (!has_context_vars) {
+    throw new Error('"'+bits[0]+'" expected at least one variable assignment')
+  }
+  if (remaining_bits.length) {
+    throw new Error('"'+bits[0]+'" received an invalid token: "'+remaining_bits[0]+'"')
+  }
 
   parser.tokens.shift()
   return new cons(nodelist, extra_context)
@@ -3172,9 +3203,9 @@ cons.parse = function(contents, parser) {
 
 proto.render = function(context) {
   var self = this
-    , result
     , promise = new Promise
     , promises = 0
+    , value
 
   context = context.copy()
 
@@ -3194,19 +3225,17 @@ proto.render = function(context) {
       if(value && value.constructor === Promise) {
         promises++
         value.once('done', promise_resolved(key))
-      }
-      else {
+      } else {
         context[key] = value
       }
     }
   }
 
-  if (promises)
+  if(promises) {
     return promise
-  else
-    result = self.nodes.render(context)
+  }
 
-  return result
+  return self.nodes.render(context)
 }
 
 },{"../promise":71}],88:[function(require,module,exports){
